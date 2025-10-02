@@ -15,6 +15,10 @@ if ($hassiteconfig) { // This ensures the settings are only available to site ad
     $lti_page = new admin_externalpage('local_skill5_lti_management', get_string('ltimanagement', 'local_skill5'), new moodle_url('/local/skill5/lti_management.php'));
     $ADMIN->add('local_skill5_category', $lti_page);
 
+    // 4. Define the User Management page and add it to the parent node.
+    $user_page = new admin_externalpage('local_skill5_user_management', get_string('usermanagement', 'local_skill5'), new moodle_url('/local/skill5/user_management.php'));
+    $ADMIN->add('local_skill5_category', $user_page);
+
     // --- Define the content of the main settings page ---
 
     // Check if the tool is already created.

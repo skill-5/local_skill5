@@ -34,7 +34,7 @@ class lti_manager {
                 'Authorization: Bearer ' . self::API_LTI_JWT_SECRET
             ]
         ];
-        $response = $curl->post(self::SKILL5_URL . '/api/public/plugins/moodle/get-entity-user', json_encode(['email' => $admin_email]), $options);
+        $response = $curl->post(self::SKILL5_URL . '/api/plugins/moodle/register/info/entity-user', json_encode(['email' => $admin_email]), $options);
 
         if ($curl->info['http_code'] !== 200) {
             throw new \moodle_exception('connection_failed', 'local_skill5', '', null, 'Could not fetch EntityUser ID from Skill5 API. Response: ' . $response);
@@ -182,7 +182,7 @@ class lti_manager {
     private static function register_moodle_on_skill5_app(string $clientid, string $entityuser_id, string $api_lti_jwt_secret, int $newtoolid) {
         global $CFG;
         $skill5_app_payload = [
-            'client_id' => $clientid,
+            'clientId' => $clientid,
             'issuer' => $CFG->wwwroot,
             'entityUserId' => $entityuser_id
         ];
@@ -195,7 +195,7 @@ class lti_manager {
         ];
 
         $curl_skill5 = new \curl();
-        $response_skill5 = $curl_skill5->post(self::SKILL5_URL . '/api/public/plugins/moodle/register-moodle', json_encode($skill5_app_payload), $options);
+        $response_skill5 = $curl_skill5->post(self::SKILL5_URL . '/api/plugins/moodle/register', json_encode($skill5_app_payload), $options);
 
         if ($curl_skill5->info['http_code'] != 200 && $curl_skill5->info['http_code'] != 201) {
             lti_delete_type($newtoolid);

@@ -45,3 +45,6 @@ $string['connection_established_text'] = 'A Skill5 LTI tool is already configure
 $string['connection_established_tip'] = 'You can view the connection details on the {$a}. If you need to generate a new connection, you must first delete the existing tool from the Moodle LTI tools page.';
 $string['ltimanagement_link_text'] = 'LTI Management page';
 
+// User Management Page
+$string['usermanagement'] = 'User Management';
+
