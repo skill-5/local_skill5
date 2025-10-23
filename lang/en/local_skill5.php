@@ -24,6 +24,7 @@ $string['connectiondetails'] = 'Connection Details';
 $string['ltitoolinfo'] = 'LTI Tool Information';
 $string['skill5userinfo'] = 'Skill5 User Information';
 $string['label_clientid'] = 'Client ID';
+$string['label_adminname'] = 'Administrator Name';
 $string['label_adminemail'] = 'Administrator Email';
 $string['label_entityuserid'] = 'Skill5 Entity User ID';
 $string['nextsteps'] = 'Next Steps';

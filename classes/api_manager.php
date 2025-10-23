@@ -7,7 +7,6 @@ defined('MOODLE_INTERNAL') || die();
 class api_manager {
 
     private const SKILL5_URL = 'https://beta.skill5.com';
-    private const API_LTI_JWT_SECRET = 'skill5_lti_jwt_key';
 
     /**
      * Returns the base URL for the Skill5 API.
@@ -16,6 +15,23 @@ class api_manager {
      */
     public static function get_skill5_url(): string {
         return self::SKILL5_URL;
+    }
+
+    /**
+     * Returns the API JWT Secret from configuration.
+     *
+     * @return string
+     * @throws \moodle_exception if secret is not configured
+     */
+    private static function get_api_jwt_secret(): string {
+        $secret = get_config('local_skill5', 'api_jwt_secret');
+        
+        if (empty($secret)) {
+            throw new \moodle_exception('error', 'local_skill5', '', null, 
+                'API JWT Secret not found in configuration. Please reconnect the plugin.');
+        }
+        
+        return $secret;
     }
 
     /**
@@ -111,7 +127,7 @@ class api_manager {
         $curl = new \curl();
         $headers = [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . self::API_LTI_JWT_SECRET
+            'Authorization: Bearer ' . self::get_api_jwt_secret()
         ];
 
         $response = null;

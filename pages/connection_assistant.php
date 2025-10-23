@@ -36,10 +36,14 @@ if ($tool) {
 
     // Display Skill5 User Info.
     $admin_email = get_config('local_skill5', 'admin_email');
+    $admin_name = get_config('local_skill5', 'admin_name');
     $entityuser_id = get_config('local_skill5', 'entityuserid');
 
     echo $OUTPUT->heading(get_string('skill5userinfo', 'local_skill5'), 4);
     $user_info_html = '<ul>';
+    if (!empty($admin_name)) {
+        $user_info_html .= '<li><strong>' . get_string('label_adminname', 'local_skill5') . ':</strong> ' . $admin_name . '</li>';
+    }
     $user_info_html .= '<li><strong>' . get_string('label_adminemail', 'local_skill5') . ':</strong> ' . $admin_email . '</li>';
     $user_info_html .= '<li><strong>' . get_string('label_entityuserid', 'local_skill5') . ':</strong> ' . $entityuser_id . '</li>';
     $user_info_html .= '</ul>';

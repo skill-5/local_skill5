@@ -7,7 +7,6 @@ defined('MOODLE_INTERNAL') || die();
 class lti_manager {
 
     private const LTI_SERVER_URL = 'https://gvpnpeetmg.us-east-2.awsapprunner.com';
-    private const API_LTI_JWT_SECRET = 'skill5_lti_jwt_key';
 
     /**
      * Creates and configures the LTI 1.3 tool programmatically.
@@ -25,25 +24,33 @@ class lti_manager {
             throw new \moodle_exception('missingconfig', 'local_skill5');
         }
 
-        // 2. Fetch the EntityUser ID from Skill5 API.
+        // 2. Fetch the EntityUser ID, Entity ID and JWT Secret from Skill5 API (no authentication required).
         $curl = new \curl();
         $options = [
             'httpheader' => [
-                'Content-Type: application/json',
-                'Authorization: Bearer ' . self::API_LTI_JWT_SECRET
+                'Content-Type: application/json'
             ]
         ];
         $response = $curl->post(api_manager::get_skill5_url() . '/api/plugins/moodle/register/info/entity-user', json_encode(['email' => $admin_email]), $options);
 
         if ($curl->info['http_code'] !== 200) {
-            throw new \moodle_exception('connection_failed', 'local_skill5', '', null, 'Could not fetch EntityUser ID from Skill5 API. Response: ' . $response);
+            throw new \moodle_exception('connection_failed', 'local_skill5', '', null, 'Could not fetch Entity data from Skill5 API. Response: ' . $response);
         }
         $entity_data = json_decode($response);
-        if (empty($entity_data->entityUserId)) {
-            throw new \moodle_exception('connection_failed', 'local_skill5', '', null, 'Invalid response from Skill5 API when fetching EntityUser ID.');
+        if (empty($entity_data->entityUserId) || empty($entity_data->entityId) || empty($entity_data->jwtSecret)) {
+            throw new \moodle_exception('connection_failed', 'local_skill5', '', null, 'Invalid response from Skill5 API. Missing entityUserId, entityId or jwtSecret.');
         }
         $entityuser_id = $entity_data->entityUserId;
+        $entity_id = $entity_data->entityId;
+        $jwt_secret = $entity_data->jwtSecret;
+        $admin_name = !empty($entity_data->name) ? $entity_data->name : '';
+        
         set_config('entityuserid', $entityuser_id, 'local_skill5');
+        set_config('entityid', $entity_id, 'local_skill5');
+        set_config('api_jwt_secret', $jwt_secret, 'local_skill5');
+        if (!empty($admin_name)) {
+            set_config('admin_name', $admin_name, 'local_skill5');
+        }
 
         // 3. Define the LTI tool parameters.
         $tool = self::get_tool_definition(self::LTI_SERVER_URL);
@@ -62,14 +69,31 @@ class lti_manager {
         }
 
         // 5. Register the platform on the LTI Server.
-        self::register_platform_on_lti_server(self::LTI_SERVER_URL, $clientid, self::API_LTI_JWT_SECRET, $newtool->id);
+        self::register_platform_on_lti_server(self::LTI_SERVER_URL, $clientid, $newtool->id);
 
         // 6. Register the Moodle instance on the Skill5 Application.
-        self::register_moodle_on_skill5_app($clientid, $entityuser_id, self::API_LTI_JWT_SECRET, $newtool->id);
+        self::register_moodle_on_skill5_app($clientid, $entityuser_id, $newtool->id);
 
         // 7. Finalize.
         set_config('connection_status', 'success', 'local_skill5');
         redirect(new \moodle_url('/local/skill5/pages/landing.php'));
+    }
+
+    /**
+     * Returns the API JWT Secret from configuration.
+     *
+     * @return string
+     * @throws \moodle_exception if secret is not configured
+     */
+    private static function get_api_jwt_secret(): string {
+        $secret = get_config('local_skill5', 'api_jwt_secret');
+        
+        if (empty($secret)) {
+            throw new \moodle_exception('error', 'local_skill5', '', null, 
+                'API JWT Secret not found in configuration. Please reconnect the plugin.');
+        }
+        
+        return $secret;
     }
 
     /**
@@ -132,12 +156,11 @@ class lti_manager {
      *
      * @param string $lti_server_url
      * @param string $clientid
-     * @param string $api_lti_jwt_secret
      * @param int $newtoolid
      * @return void
      * @throws \moodle_exception
      */
-    private static function register_platform_on_lti_server(string $lti_server_url, string $clientid, string $api_lti_jwt_secret, int $newtoolid) {
+    private static function register_platform_on_lti_server(string $lti_server_url, string $clientid, int $newtoolid) {
         global $CFG;
         $lti_server_payload = [
             'platformUrl' => $CFG->wwwroot,
@@ -154,7 +177,7 @@ class lti_manager {
         $options = [
             'httpheader' => [
                 'Content-Type: application/json',
-                'Authorization: Bearer ' . $api_lti_jwt_secret
+                'Authorization: Bearer ' . self::get_api_jwt_secret()
             ]
         ];
         $response_lti = $curl_lti->post($lti_server_url . '/platforms', json_encode($lti_server_payload), $options);
@@ -173,12 +196,11 @@ class lti_manager {
      *
      * @param string $clientid
      * @param string $entityuser_id
-     * @param string $api_lti_jwt_secret
      * @param int $newtoolid
      * @return void
      * @throws \moodle_exception
      */
-    private static function register_moodle_on_skill5_app(string $clientid, string $entityuser_id, string $api_lti_jwt_secret, int $newtoolid) {
+    private static function register_moodle_on_skill5_app(string $clientid, string $entityuser_id, int $newtoolid) {
         global $CFG;
         $skill5_app_payload = [
             'clientId' => $clientid,
@@ -189,7 +211,7 @@ class lti_manager {
         $options = [
             'httpheader' => [
                 'Content-Type: application/json',
-                'Authorization: Bearer ' . $api_lti_jwt_secret
+                'Authorization: Bearer ' . self::get_api_jwt_secret()
             ]
         ];
 
