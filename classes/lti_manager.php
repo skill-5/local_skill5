@@ -6,7 +6,7 @@ defined('MOODLE_INTERNAL') || die();
 
 class lti_manager {
 
-    private const LTI_SERVER_URL = 'https://gvpnpeetmg.us-east-2.awsapprunner.com';
+    private const LTI_SERVER_URL = 'https://6as3yttb3k.us-east-1.awsapprunner.com';
 
     /**
      * Creates and configures the LTI 1.3 tool programmatically.
