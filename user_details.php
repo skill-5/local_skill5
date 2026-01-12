@@ -4,10 +4,10 @@ require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 // Get the user ID from the URL.
-$entity_user_id = required_param('id', PARAM_RAW);
+$entity_user_id = required_param('id', PARAM_ALPHANUMEXT);
 
 // Ensure the user has the required capability.
-admin_externalpage_setup('local_skill5_user_management'); // Re-using the same capability.
+admin_externalpage_setup('local_skill5_user_management');
 
 // Start page output.
 echo $OUTPUT->header();
