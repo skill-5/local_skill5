@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Connection assistant page for Skill5 plugin.
+ *
+ * @package    local_skill5
+ * @copyright  2025 Skill5
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -30,31 +52,14 @@ $tool = $DB->get_record('lti_types', ['name' => 'Skill5 LTI Tool']);
 
 if ($tool) {
     // --- STATE: CONNECTED ---
-    echo $OUTPUT->box_start('generalbox boxaligncenter');
-    echo $OUTPUT->heading(get_string('connection_established_heading', 'local_skill5'), 3);
-    echo '<p>' . get_string('connection_established_text', 'local_skill5') . '</p>';
-
     // Display Skill5 User Info.
     $admin_email = get_config('local_skill5', 'admin_email');
     $admin_name = get_config('local_skill5', 'admin_name');
     $entityuser_id = get_config('local_skill5', 'entityuserid');
 
-    echo $OUTPUT->heading(get_string('skill5userinfo', 'local_skill5'), 4);
-    $user_info_html = '<ul>';
-    if (!empty($admin_name)) {
-        $user_info_html .= '<li><strong>' . get_string('label_adminname', 'local_skill5') . ':</strong> ' . $admin_name . '</li>';
-    }
-    $user_info_html .= '<li><strong>' . get_string('label_adminemail', 'local_skill5') . ':</strong> ' . $admin_email . '</li>';
-    $user_info_html .= '<li><strong>' . get_string('label_entityuserid', 'local_skill5') . ':</strong> ' . $entityuser_id . '</li>';
-    $user_info_html .= '</ul>';
-    echo $user_info_html;
-
-    // Display tip.
-    $lti_management_url = new moodle_url('/local/skill5/pages/lti_management.php');
-    $lti_management_link = html_writer::link($lti_management_url, get_string('ltimanagement_link_text', 'local_skill5'));
-    echo html_writer::tag('div', get_string('connection_established_tip', 'local_skill5', $lti_management_link), ['class' => 'text-muted', 'style' => 'margin-top: 15px;']);
-
-    echo $OUTPUT->box_end();
+    // Render using template.
+    $renderable = new \local_skill5\output\connection_assistant($admin_name, $admin_email, $entityuser_id);
+    echo $OUTPUT->render($renderable);
 } else if (!empty($email_from_url)) {
     // --- STATE: EMAIL RECEIVED, AUTO-CONNECTING ---
     // Save the email and proceed to the connection script.

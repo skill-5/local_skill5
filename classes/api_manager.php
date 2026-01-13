@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * API manager class for Skill5 plugin.
+ *
+ * @package    local_skill5
+ * @copyright  2025 Skill5
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 namespace local_skill5;
 
@@ -27,8 +49,7 @@ class api_manager {
         $secret = get_config('local_skill5', 'api_jwt_secret');
         
         if (empty($secret)) {
-            throw new \moodle_exception('error', 'local_skill5', '', null, 
-                'API JWT Secret not found in configuration. Please reconnect the plugin.');
+            throw new \moodle_exception('error_api_jwt_secret', 'local_skill5');
         }
         
         return $secret;
@@ -45,7 +66,7 @@ class api_manager {
         $admin_entity_user_id = get_config('local_skill5', 'entityuserid');
 
         if (empty($admin_entity_user_id)) {
-            throw new \moodle_exception('error', 'local_skill5', '', null, 'Admin Entity User ID not found in config. Please reconnect the plugin.');
+            throw new \moodle_exception('error_entity_user_id', 'local_skill5');
         }
 
         $endpoint = self::SKILL5_URL . '/api/plugins/moodle/admin/users';
@@ -87,7 +108,7 @@ class api_manager {
         $response_data = self::send_request($endpoint, $payload, 'POST');
 
         if (empty($response_data->entityUserId)) {
-            throw new \moodle_exception('connection_failed', 'local_skill5', '', null, 'Invalid response from Skill5 API when fetching EntityUser ID.');
+            throw new \moodle_exception('error_invalid_response', 'local_skill5');
         }
 
         return $response_data->entityUserId;
@@ -140,11 +161,12 @@ class api_manager {
         }
 
         if ($response === false || $curl->get_errno()) {
-            throw new \moodle_exception('connection_failed', 'local_skill5', '', null, "cURL request failed with error: " . $curl->get_error());
+            throw new \moodle_exception('error_curl_request', 'local_skill5', '', null, $curl->get_error());
         }
 
         if (!in_array($curl->info['http_code'], $expected_codes)) {
-            throw new \moodle_exception('connection_failed', 'local_skill5', '', null, "API request to {$endpoint} failed with HTTP code {$curl->info['http_code']}. Response: " . $response);
+            $error_data = (object)['endpoint' => $endpoint, 'httpcode' => $curl->info['http_code'], 'response' => $response];
+            throw new \moodle_exception('error_api_request', 'local_skill5', '', $error_data);
         }
 
         return json_decode($response);

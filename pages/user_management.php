@@ -1,4 +1,26 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * User management page for Skill5 plugin.
+ *
+ * @package    local_skill5
+ * @copyright  2025 Skill5
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 
 require_once(__DIR__ . '/../../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -22,40 +44,14 @@ echo $OUTPUT->heading($heading);
 try {
     $users = local_skill5\api_manager::get_users();
 } catch (Exception $e) {
-    echo $OUTPUT->notification('Error fetching users from Skill5: ' . $e->getMessage());
+    echo $OUTPUT->notification(get_string('error_fetch_users', 'local_skill5') . ': ' . $e->getMessage());
     echo $OUTPUT->footer();
     exit;
 }
 
-// Define table headers.
-$table = new html_table();
-$table->head = [
-    get_string('name'),
-    get_string('email'),
-    'Login Count',
-    'Last Login',
-    'Actions'
-];
-
-// Populate table rows.
-if (!empty($users)) {
-    foreach ($users as $user) {
-        $last_login = $user->lastLoginAt ? userdate(strtotime($user->lastLoginAt)) : 'Never';
-        $details_url = new moodle_url('/local/skill5/user_details.php', ['id' => $user->entityUserId]);
-        $details_link = html_writer::link($details_url, 'View Details');
-
-        $row = new html_table_row([
-            $user->name,
-            $user->email,
-            $user->loginCount,
-            $last_login,
-            $details_link
-        ]);
-        $table->data[] = $row;
-    }
-}
-
-echo html_writer::table($table);
+// Render using template.
+$renderable = new \local_skill5\output\user_management($users);
+echo $OUTPUT->render($renderable);
 
 // End page output.
 echo $OUTPUT->footer();
