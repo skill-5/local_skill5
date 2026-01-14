@@ -63,24 +63,23 @@ const handleEmailPayload = (adminEmail, connectUrl, connectionAssistantUrl) => {
         method: 'GET',
         credentials: 'same-origin'
     })
-    // eslint-disable-next-line promise/always-return
     .then(response => {
         window.console.log('[Moodle] Connect.php response received');
         if (response.ok) {
             window.console.log('[Moodle] Redirecting to connection_assistant.php');
             window.location.href = connectionAssistantUrl;
-        } else {
-            window.console.error('[Moodle] Connect.php returned error:', response.status);
-            Notification.alert(
-                'Connection Error',
-                'Connection failed. Please try again or contact support.',
-                'OK'
-            );
+            return true;
         }
+        window.console.error('[Moodle] Connect.php returned error:', response.status);
+        return Notification.alert(
+            'Connection Error',
+            'Connection failed. Please try again or contact support.',
+            'OK'
+        );
     })
     .catch(error => {
         window.console.error('[Moodle] Error calling connect.php:', error);
-        Notification.alert(
+        return Notification.alert(
             'Connection Error',
             'Connection failed. Please try again or contact support.',
             'OK'
