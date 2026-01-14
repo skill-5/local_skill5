@@ -64,7 +64,9 @@ $progresstable->head = [get_string('course', 'local_skill5'), get_string('progre
 
 if (!empty($userdetails->courseProgress)) {
     foreach ($userdetails->courseProgress as $enrollment) {
-        $completedat = $enrollment->completedAt ? userdate(strtotime($enrollment->completedAt)) : get_string('not_completed', 'local_skill5');
+        $completedat = $enrollment->completedAt
+            ? userdate(strtotime($enrollment->completedAt))
+            : get_string('not_completed', 'local_skill5');
         $progresstable->data[] = new html_table_row([
             htmlspecialchars($enrollment->name),
             htmlspecialchars($enrollment->progress),

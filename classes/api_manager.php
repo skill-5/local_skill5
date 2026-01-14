@@ -151,8 +151,12 @@ class api_manager {
      * @return mixed The decoded JSON response.
      * @throws \moodle_exception If request fails.
      */
-    private static function send_request(string $endpoint, array $params = [], string $method = 'GET',
-            array $expectedcodes = [200]) {
+    private static function send_request(
+        string $endpoint,
+        array $params = [],
+        string $method = 'GET',
+        array $expectedcodes = [200]
+    ) {
         $curl = new \curl();
         $headers = [
             'Content-Type: application/json',
