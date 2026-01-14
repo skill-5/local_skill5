@@ -12,12 +12,15 @@
   "author": "Skill5",
   "license": "GPL-3.0",
   "devDependencies": {
-    "@babel/core": "^7.28.6",
-    "@babel/plugin-transform-modules-amd": "^7.27.1",
-    "@babel/preset-env": "^7.28.6",
-    "grunt": "^1.5.3",
-    "grunt-babel": "^8.0.0",
-    "grunt-contrib-uglify": "^5.2.2",
-    "grunt-contrib-watch": "^1.1.0"
+    "@babel/core": "^7.24.0",
+    "@babel/preset-env": "^7.24.0",
+    "babel-plugin-system-import-transformer": "^3.0.0",
+    "babel-plugin-transform-es2015-modules-amd-lazy": "^1.0.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
+    "grunt": "^1.6.1",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-rollup": "^12.0.0",
+    "rollup": "^2.79.1",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }

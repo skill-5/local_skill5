@@ -1,13 +1,17 @@
-define(["exports", "core/ajax", "core/notification"], function (_exports, _ajax, _notification) {
+define(["exports", "core/ajax", "core/notification"], function (exports, _ajax, _notification) {
   "use strict";
 
-  Object.defineProperty(_exports, "__esModule", {
+  Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  _exports.init = void 0;
-  _ajax = _interopRequireDefault(_ajax);
-  _notification = _interopRequireDefault(_notification);
-  function _interopRequireDefault(e) { return e && e.__esModule ? e : { "default": e }; }
+  exports.init = undefined;
+  var _ajax2 = _interopRequireDefault(_ajax);
+  var _notification2 = _interopRequireDefault(_notification);
+  function _interopRequireDefault(e) {
+    return e && e.__esModule ? e : {
+      default: e
+    };
+  }
   /**
    * Landing page handshake module for Skill5 integration.
    *
@@ -23,7 +27,7 @@ define(["exports", "core/ajax", "core/notification"], function (_exports, _ajax,
    * @param {string} connectUrl The URL to connect.php
    * @param {string} connectionAssistantUrl The URL to connection_assistant.php
    */
-  var init = _exports.init = function init(skill5Origin, connectUrl, connectionAssistantUrl) {
+  var init = exports.init = function init(skill5Origin, connectUrl, connectionAssistantUrl) {
     window.console.log('[Moodle] Handshake listener is active.');
     window.addEventListener('message', function (event) {
       if (event.origin !== skill5Origin) {
@@ -73,11 +77,13 @@ define(["exports", "core/ajax", "core/notification"], function (_exports, _ajax,
         window.location.href = connectionAssistantUrl;
       } else {
         window.console.error('[Moodle] Connect.php returned error:', response.status);
-        _notification["default"].alert('Connection Error', 'Connection failed. Please try again or contact support.', 'OK');
+        _notification2["default"].alert('Connection Error', 'Connection failed. Please try again or contact support.', 'OK');
       }
     })["catch"](function (error) {
       window.console.error('[Moodle] Error calling connect.php:', error);
-      _notification["default"].alert('Connection Error', 'Connection failed. Please try again or contact support.', 'OK');
+      _notification2["default"].alert('Connection Error', 'Connection failed. Please try again or contact support.', 'OK');
     });
   };
 });
+
+//# sourceMappingURL=landing_handshake.js.map
