@@ -33,47 +33,46 @@ use stdClass;
  * User Management page renderable.
  */
 class user_management implements renderable, templatable {
-    
-    /** @var array Users data */
+    /** @var array Users data. */
     private $users;
-    
+
     /**
      * Constructor.
      *
-     * @param array $users Array of user objects from API
+     * @param array $users Array of user objects from API.
      */
     public function __construct($users) {
         $this->users = $users;
     }
-    
+
     /**
      * Export data for template.
      *
-     * @param renderer_base $output
-     * @return stdClass
+     * @param renderer_base $output The renderer.
+     * @return stdClass Data for template.
      */
     public function export_for_template(renderer_base $output) {
         $data = new stdClass();
-        
+
         if (!empty($this->users)) {
             $data->users = new stdClass();
             $data->users->list = [];
-            
+
             foreach ($this->users as $user) {
-                $last_login = $user->lastLoginAt ? userdate(strtotime($user->lastLoginAt)) : get_string('never', 'local_skill5');
-                $details_url = new \moodle_url('/local/skill5/user_details.php', ['id' => $user->entityUserId]);
-                
+                $lastlogin = $user->lastLoginAt ? userdate(strtotime($user->lastLoginAt)) : get_string('never', 'local_skill5');
+                $detailsurl = new \moodle_url('/local/skill5/user_details.php', ['id' => $user->entityUserId]);
+
                 $data->users->list[] = (object)[
                     'name' => $user->name,
                     'email' => $user->email,
                     'logincount' => $user->loginCount,
-                    'lastlogin' => $last_login,
-                    'detailsurl' => $details_url->out(false),
-                    'detailstext' => get_string('view_details', 'local_skill5')
+                    'lastlogin' => $lastlogin,
+                    'detailsurl' => $detailsurl->out(false),
+                    'detailstext' => get_string('view_details', 'local_skill5'),
                 ];
             }
         }
-        
+
         return $data;
     }
 }

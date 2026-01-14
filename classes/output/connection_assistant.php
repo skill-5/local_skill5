@@ -33,63 +33,62 @@ use stdClass;
  * Connection Assistant page renderable.
  */
 class connection_assistant implements renderable, templatable {
-    
-    /** @var string Admin name */
-    private $admin_name;
-    
-    /** @var string Admin email */
-    private $admin_email;
-    
-    /** @var string Entity user ID */
-    private $entityuser_id;
-    
+    /** @var string Admin name. */
+    private $adminname;
+
+    /** @var string Admin email. */
+    private $adminemail;
+
+    /** @var string Entity user ID. */
+    private $entityuserid;
+
     /**
      * Constructor.
      *
-     * @param string $admin_name Admin name (can be empty)
-     * @param string $admin_email Admin email
-     * @param string $entityuser_id Entity user ID
+     * @param string $adminname Admin name (can be empty).
+     * @param string $adminemail Admin email.
+     * @param string $entityuserid Entity user ID.
      */
-    public function __construct($admin_name, $admin_email, $entityuser_id) {
-        $this->admin_name = $admin_name;
-        $this->admin_email = $admin_email;
-        $this->entityuser_id = $entityuser_id;
+    public function __construct($adminname, $adminemail, $entityuserid) {
+        $this->adminname = $adminname;
+        $this->adminemail = $adminemail;
+        $this->entityuserid = $entityuserid;
     }
-    
+
     /**
      * Export data for template.
      *
-     * @param renderer_base $output
-     * @return stdClass
+     * @param renderer_base $output The renderer.
+     * @return stdClass Data for template.
      */
     public function export_for_template(renderer_base $output) {
         $data = new stdClass();
-        
+
         // Build user info array.
         $data->userinfo = [];
-        
-        if (!empty($this->admin_name)) {
+
+        if (!empty($this->adminname)) {
             $data->userinfo[] = (object)[
                 'label' => get_string('label_adminname', 'local_skill5'),
-                'value' => $this->admin_name
+                'value' => $this->adminname,
             ];
         }
-        
+
         $data->userinfo[] = (object)[
             'label' => get_string('label_adminemail', 'local_skill5'),
-            'value' => $this->admin_email
+            'value' => $this->adminemail,
         ];
-        
+
         $data->userinfo[] = (object)[
             'label' => get_string('label_entityuserid', 'local_skill5'),
-            'value' => $this->entityuser_id
+            'value' => $this->entityuserid,
         ];
-        
+
         // Build tip with link.
-        $lti_management_url = new \moodle_url('/local/skill5/pages/lti_management.php');
-        $lti_management_link = \html_writer::link($lti_management_url, get_string('ltimanagement_link_text', 'local_skill5'));
-        $data->tip = get_string('connection_established_tip', 'local_skill5', $lti_management_link);
-        
+        $ltimanagementurl = new \moodle_url('/local/skill5/pages/lti_management.php');
+        $ltimanagementlink = \html_writer::link($ltimanagementurl, get_string('ltimanagement_link_text', 'local_skill5'));
+        $data->tip = get_string('connection_established_tip', 'local_skill5', $ltimanagementlink);
+
         return $data;
     }
 }

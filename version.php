@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for local_skill5 plugin
+ * Version information for local_skill5 plugin.
  *
  * @package    local_skill5
  * @copyright  2025 Skill5
@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_skill5';
-$plugin->version   = 2026011401; // YYYYMMDDXX (Year, Month, Day, Version)
-$plugin->requires  = 2022112800; // Moodle 4.1+
+$plugin->version   = 2026011401; // YYYYMMDDXX format.
+$plugin->requires  = 2022112800; // Moodle 4.1 or later.
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = '1.0';

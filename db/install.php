@@ -22,17 +22,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Post installation procedure.
- * 
+ *
  * This function is executed right after the plugin installation is complete.
  * It sets a flag to redirect the user to the plugin's landing page.
  */
 function xmldb_local_skill5_install() {
-    // Set a config flag to indicate that we should redirect after installation
+    // Set a config flag to indicate that we should redirect after installation.
     set_config('redirect_after_install', 1, 'local_skill5');
-    
+
     return true;
 }

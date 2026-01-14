@@ -24,10 +24,17 @@
 
 namespace local_skill5;
 
-defined('MOODLE_INTERNAL') || die();
-
+/**
+ * API manager class for Skill5 integration.
+ *
+ * Handles all communication with the Skill5 API.
+ *
+ * @package    local_skill5
+ * @copyright  2025 Skill5
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class api_manager {
-
+    /** @var string Skill5 API base URL. */
     private const SKILL5_URL = 'https://app.skill5.com';
 
     /**
@@ -47,11 +54,11 @@ class api_manager {
      */
     private static function get_api_jwt_secret(): string {
         $secret = get_config('local_skill5', 'api_jwt_secret');
-        
+
         if (empty($secret)) {
             throw new \moodle_exception('error_api_jwt_secret', 'local_skill5');
         }
-        
+
         return $secret;
     }
 
@@ -63,33 +70,33 @@ class api_manager {
      */
     public static function get_users(): ?array {
         // The API now expects the admin's Entity User ID to identify the Moodle instance.
-        $admin_entity_user_id = get_config('local_skill5', 'entityuserid');
+        $adminentityuserid = get_config('local_skill5', 'entityuserid');
 
-        if (empty($admin_entity_user_id)) {
+        if (empty($adminentityuserid)) {
             throw new \moodle_exception('error_entity_user_id', 'local_skill5');
         }
 
         $endpoint = self::SKILL5_URL . '/api/plugins/moodle/admin/users';
-        $params = ['entityUserId' => $admin_entity_user_id];
+        $params = ['entityUserId' => $adminentityuserid];
 
-        $response_data = self::send_request($endpoint, $params, 'GET');
+        $responsedata = self::send_request($endpoint, $params, 'GET');
 
-        if (empty($response_data->data)) {
+        if (empty($responsedata->data)) {
             return [];
         }
 
-        return $response_data->data;
+        return $responsedata->data;
     }
 
     /**
      * Fetches details for a specific user.
      *
-     * @param string $user_id The user's ID.
+     * @param string $entityuserid The entity user ID.
      * @return \stdClass|null The user details or null on failure.
-     * @throws \moodle_exception
+     * @throws \moodle_exception If API request fails.
      */
-    public static function get_user_details(string $entity_user_id): ?\stdClass {
-        $endpoint = self::SKILL5_URL . '/api/plugins/moodle/admin/users/' . $entity_user_id;
+    public static function get_user_details(string $entityuserid): ?\stdClass {
+        $endpoint = self::SKILL5_URL . '/api/plugins/moodle/admin/users/' . $entityuserid;
 
         return self::send_request($endpoint, [], 'GET');
     }
@@ -97,38 +104,38 @@ class api_manager {
     /**
      * Fetches the EntityUser ID from the Skill5 API for a given admin email.
      *
-     * @param string $admin_email
-     * @return string
-     * @throws \moodle_exception
+     * @param string $adminemail The admin email address.
+     * @return string The entity user ID.
+     * @throws \moodle_exception If API request fails.
      */
-    public static function get_entity_user_id(string $admin_email): string {
+    public static function get_entity_user_id(string $adminemail): string {
         $endpoint = self::SKILL5_URL . '/api/plugins/moodle/register/info/entity-user';
-        $payload = ['email' => $admin_email];
+        $payload = ['email' => $adminemail];
 
-        $response_data = self::send_request($endpoint, $payload, 'POST');
+        $responsedata = self::send_request($endpoint, $payload, 'POST');
 
-        if (empty($response_data->entityUserId)) {
+        if (empty($responsedata->entityUserId)) {
             throw new \moodle_exception('error_invalid_response', 'local_skill5');
         }
 
-        return $response_data->entityUserId;
+        return $responsedata->entityUserId;
     }
 
     /**
      * Registers the Moodle instance on the Skill5 application.
      *
-     * @param string $clientid
-     * @param string $entityuser_id
+     * @param string $clientid The LTI client ID.
+     * @param string $entityuserid The entity user ID.
      * @return void
-     * @throws \moodle_exception
+     * @throws \moodle_exception If API request fails.
      */
-    public static function register_moodle_on_skill5_app(string $clientid, string $entityuser_id): void {
+    public static function register_moodle_on_skill5_app(string $clientid, string $entityuserid): void {
         global $CFG;
         $endpoint = self::SKILL5_URL . '/api/plugins/moodle/register';
         $payload = [
             'clientId' => $clientid,
             'issuer' => $CFG->wwwroot,
-            'entityUserId' => $entityuser_id
+            'entityUserId' => $entityuserid,
         ];
 
         self::send_request($endpoint, $payload, 'POST', [200, 201]);
@@ -140,15 +147,16 @@ class api_manager {
      * @param string $endpoint The API endpoint URL.
      * @param array $params The data/parameters for the request.
      * @param string $method The HTTP method (GET, POST, etc.).
-     * @param array $expected_codes Expected successful HTTP status codes.
+     * @param array $expectedcodes Expected successful HTTP status codes.
      * @return mixed The decoded JSON response.
-     * @throws \moodle_exception
+     * @throws \moodle_exception If request fails.
      */
-    private static function send_request(string $endpoint, array $params = [], string $method = 'GET', array $expected_codes = [200]) {
+    private static function send_request(string $endpoint, array $params = [], string $method = 'GET',
+            array $expectedcodes = [200]) {
         $curl = new \curl();
         $headers = [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . self::get_api_jwt_secret()
+            'Authorization: Bearer ' . self::get_api_jwt_secret(),
         ];
 
         $response = null;
@@ -164,9 +172,9 @@ class api_manager {
             throw new \moodle_exception('error_curl_request', 'local_skill5', '', null, $curl->get_error());
         }
 
-        if (!in_array($curl->info['http_code'], $expected_codes)) {
-            $error_data = (object)['endpoint' => $endpoint, 'httpcode' => $curl->info['http_code'], 'response' => $response];
-            throw new \moodle_exception('error_api_request', 'local_skill5', '', $error_data);
+        if (!in_array($curl->info['http_code'], $expectedcodes)) {
+            $errordata = (object)['endpoint' => $endpoint, 'httpcode' => $curl->info['http_code'], 'response' => $response];
+            throw new \moodle_exception('error_api_request', 'local_skill5', '', $errordata);
         }
 
         return json_decode($response);

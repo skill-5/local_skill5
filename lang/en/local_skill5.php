@@ -36,13 +36,13 @@ $string['connect_button'] = 'Connect with Skill5';
 $string['connection_failed'] = 'Connection to Skill5 failed. Please check your settings and try again. Error details: {$a}';
 $string['connect_heading'] = 'Automatic Connection';
 
-// LTI Management Page
+// LTI Management Page.
 $string['ltimanagement'] = 'LTI Management';
 $string['lticonnected'] = 'The Skill5 LTI tool is connected and active.';
 $string['ltinotconnected'] = 'The Skill5 LTI tool is not connected. Please go to the main settings page to connect.';
 $string['connect'] = 'Go to connection page';
 
-// LTI Management Page - Revamped
+// LTI Management Page - Revamped.
 $string['connectiondetails'] = 'Connection Details';
 $string['ltitoolinfo'] = 'LTI Tool Information';
 $string['skill5userinfo'] = 'Skill5 User Information';
@@ -62,7 +62,7 @@ $string['step2_instruction_2'] = 'Click \'Add an activity or resource\' and sele
 $string['step2_instruction_3'] = 'Click the \'Select content\' button. This will open the Skill5 content library, allowing you to choose the course you want to link.';
 $string['step2_instruction_4'] = 'Save the activity. Students can now access the Skill5 content directly from the Moodle course.';
 
-// Settings Page - Revamped
+// Settings Page - Revamped.
 $string['settings_intro_heading'] = 'Connect your Moodle to Skill5';
 $string['settings_intro_text'] = 'Enter your Skill5 administrator email below and click the connect button. This will automatically create and configure the LTI 1.3 tool for you.';
 $string['connection_established_heading'] = 'Connection Established';
@@ -70,10 +70,10 @@ $string['connection_established_text'] = 'A Skill5 Connection is already configu
 $string['connection_established_tip'] = 'You can view the connection details on the {$a}. If you need to generate a new connection, you must first delete the existing connection from the Moodle LTI tools page.';
 $string['ltimanagement_link_text'] = 'LTI Management page';
 
-// User Management Page
+// User Management Page.
 $string['usermanagement'] = 'User Management';
 
-// Connection Assistant Page & Summary
+// Connection Assistant Page and Summary.
 $string['connectionassistant'] = 'Skill5 Connection Assistant';
 $string['connectionstatus'] = 'Connection Status';
 $string['summary_connected'] = 'The connection to Skill5 is active for the user: {$a}.';

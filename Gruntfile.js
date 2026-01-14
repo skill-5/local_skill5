@@ -54,9 +54,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
 
-    // Registers the 'amd' task that you defined in package.json
+    // Registers the 'amd' task that you defined in package.json.
     grunt.registerTask('amd', ['babel', 'uglify']);
     
-    // Default task
+    // Stylelint task (empty for plugins without SCSS).
+    grunt.registerTask('stylelint', []);
+    
+    // Default task.
     grunt.registerTask('default', ['amd']);
 };

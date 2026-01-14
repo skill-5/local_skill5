@@ -35,12 +35,12 @@ echo $OUTPUT->heading(get_string('ltimanagement', 'local_skill5'));
 
 // Fetch connection data.
 $tool = $DB->get_record('lti_types', ['name' => 'Skill5 LTI Tool']);
-$admin_email = get_config('local_skill5', 'admin_email');
-$entityuser_id = get_config('local_skill5', 'entityuserid');
+$adminemail = get_config('local_skill5', 'admin_email');
+$entityuserid = get_config('local_skill5', 'entityuserid');
 
-if ($tool && $admin_email && $entityuser_id) {
+if ($tool && $adminemail && $entityuserid) {
     // Render using template.
-    $renderable = new \local_skill5\output\lti_management($tool, $admin_email, $entityuser_id);
+    $renderable = new \local_skill5\output\lti_management($tool, $adminemail, $entityuserid);
     echo $OUTPUT->render($renderable);
 } else {
     // If the tool is not fully configured, redirect to the initial setup page.

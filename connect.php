@@ -29,32 +29,34 @@ require_once(__DIR__ . '/classes/lti_manager.php');
 
 use local_skill5\lti_manager;
 
+require_login();
+
 // Check for required capabilities.
 $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 
 // Check if an email is provided in the URL and save it.
-$email_from_url = optional_param('email', '', PARAM_EMAIL);
-if (!empty($email_from_url)) {
-    set_config('admin_email', $email_from_url, 'local_skill5');
+$emailfromurl = optional_param('email', '', PARAM_EMAIL);
+if (!empty($emailfromurl)) {
+    set_config('admin_email', $emailfromurl, 'local_skill5');
 }
 
 // Defer the business logic to the LTI manager class.
 try {
     lti_manager::create_lti_tool();
-    
+
     // Success! Return a JSON response for AJAX calls, or redirect for direct access.
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-        // AJAX request - return JSON
+        // AJAX request - return JSON.
         header('Content-Type: application/json');
         echo json_encode(['success' => true]);
         exit;
     } else {
-        // Direct access - redirect
+        // Direct access - redirect.
         redirect(new moodle_url('/local/skill5/pages/connection_assistant.php'));
     }
 } catch (\moodle_exception $e) {
-    // Return error response for AJAX, or display error page for direct access
+    // Return error response for AJAX, or display error page for direct access.
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
         header('Content-Type: application/json');
         http_response_code(500);
@@ -66,7 +68,7 @@ try {
         echo $OUTPUT->footer();
     }
 } catch (\Exception $e) {
-    // Return error response for AJAX, or display error page for direct access
+    // Return error response for AJAX, or display error page for direct access.
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
         header('Content-Type: application/json');
         http_response_code(500);

@@ -32,9 +32,7 @@ use core_privacy\local\metadata\collection;
  * This plugin sends user data to external services (Skill5 platform) via LTI.
  * It does not store personal user data in its own database tables.
  */
-class provider implements
-    \core_privacy\local\metadata\provider {
-
+class provider implements \core_privacy\local\metadata\provider {
     /**
      * Returns metadata about the personal data stored by this plugin.
      *
