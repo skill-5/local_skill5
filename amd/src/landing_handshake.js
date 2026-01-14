@@ -6,7 +6,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
 /**

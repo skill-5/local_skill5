@@ -16,10 +16,7 @@ pnpm-lock.yaml
 
 # Moodle specific
 # The amd/build directory contains compiled JavaScript that is generated from amd/src
-# Some projects commit these files, others don't. Uncomment the line below if you prefer
-# to generate them on deployment rather than committing them.
-# amd/build/*.min.js
-# amd/build/*.min.js.map
+# These files MUST be committed for the plugin to work in production.
 
 # Temporary files
 *.tmp

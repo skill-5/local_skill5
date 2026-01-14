@@ -1,154 +1,59 @@
 /**
  * Gruntfile for local_skill5 plugin.
  *
- * This Gruntfile uses the same Rollup/Babel/Terser configuration as Moodle core
- * to generate AMD modules that are compatible with Moodle's CI checks.
+ * This Gruntfile loads Moodle's core Gruntfile to use the standard AMD build process.
+ * When run from within a Moodle installation, it will use Moodle's Grunt tasks.
  *
- * @package    local_skill5
  * @copyright  2025 Skill5
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-"use strict";
+/* eslint-env node */
 
+/**
+ * Grunt configuration.
+ *
+ * @param {Grunt} grunt The Grunt instance.
+ */
 module.exports = function(grunt) {
-    const path = require("path");
+    const path = require('path');
+    const process = require('process');
+    const fs = require('fs');
 
-    // Load NPM tasks.
-    grunt.loadNpmTasks("grunt-rollup");
-    grunt.loadNpmTasks("grunt-contrib-watch");
+    // Store the plugin directory.
+    const pluginDir = process.cwd();
 
-    /**
-     * Rename function for AMD build output (minified).
-     * Converts amd/src/file.js to amd/build/file.min.js
-     *
-     * @param {string} destPath The destination path.
-     * @param {string} srcPath The source path.
-     * @returns {string} The renamed path.
-     */
-    const babelRenameMin = function(destPath, srcPath) {
-        destPath = srcPath.replace("amd/src", "amd/build");
-        destPath = destPath.replace(/\.js$/, ".min.js");
-        return destPath;
-    };
+    // Try to find Moodle root (go up from local/skill5 to moodle root).
+    const moodleRoot = path.resolve(pluginDir, '..', '..');
+    const moodleGruntfile = path.join(moodleRoot, 'Gruntfile.js');
 
-    /**
-     * Rename function for AMD build output (non-minified).
-     * Converts amd/src/file.js to amd/build/file.js
-     *
-     * @param {string} destPath The destination path.
-     * @param {string} srcPath The source path.
-     * @returns {string} The renamed path.
-     */
-    const babelRename = function(destPath, srcPath) {
-        destPath = srcPath.replace("amd/src", "amd/build");
-        return destPath;
-    };
+    if (fs.existsSync(moodleGruntfile)) {
+        // We are inside a Moodle installation - use Moodle's Gruntfile.
+        grunt.log.ok('Loading Moodle Gruntfile from: ' + moodleRoot);
 
-    // Babel transform function using @babel/core.
-    const babelTransform = require("@babel/core").transform;
-    const babel = (options = {}) => {
-        return {
-            name: "babel",
-            transform: (code, id) => {
-                grunt.log.debug("Transforming " + id);
-                options.filename = id;
-                const transformed = babelTransform(code, options);
-                return {
-                    code: transformed.code,
-                    map: transformed.map
-                };
-            }
-        };
-    };
+        // Change to Moodle root directory.
+        process.chdir(moodleRoot);
 
-    // Terser plugin for minification.
-    const terser = require("rollup-plugin-terser").terser;
+        // Load Moodle's Gruntfile.
+        require(moodleGruntfile)(grunt);
 
-    // Grunt configuration.
-    grunt.initConfig({
-        rollup: {
-            // Non-minified build (for development/debugging).
-            dev: {
-                options: {
-                    format: "esm",
-                    dir: "output",
-                    sourcemap: true,
-                    treeshake: false,
-                    context: "window",
-                    plugins: [
-                        babel({
-                            sourceMaps: true,
-                            comments: true,
-                            compact: false,
-                            plugins: [
-                                "transform-es2015-modules-amd-lazy",
-                                "system-import-transformer"
-                            ],
-                            presets: [
-                                ["@babel/preset-env", {
-                                    modules: false,
-                                    useBuiltIns: false
-                                }]
-                            ]
-                        })
-                    ]
-                },
-                files: [{
-                    expand: true,
-                    src: ["amd/src/*.js", "amd/src/**/*.js"],
-                    rename: babelRename
-                }]
-            },
-            // Minified build (for production).
-            dist: {
-                options: {
-                    format: "esm",
-                    dir: "output",
-                    sourcemap: true,
-                    treeshake: false,
-                    context: "window",
-                    plugins: [
-                        babel({
-                            sourceMaps: true,
-                            comments: false,
-                            compact: false,
-                            plugins: [
-                                "transform-es2015-modules-amd-lazy",
-                                "system-import-transformer"
-                            ],
-                            presets: [
-                                ["@babel/preset-env", {
-                                    modules: false,
-                                    useBuiltIns: false
-                                }]
-                            ]
-                        }),
-                        terser({
-                            // Do not mangle variables (matches Moodle config).
-                            mangle: false
-                        })
-                    ]
-                },
-                files: [{
-                    expand: true,
-                    src: ["amd/src/*.js", "amd/src/**/*.js"],
-                    rename: babelRenameMin
-                }]
-            }
-        },
-        watch: {
-            amd: {
-                files: ["amd/src/*.js", "amd/src/**/*.js"],
-                tasks: ["amd"]
-            }
-        }
-    });
+        // Change back to plugin directory.
+        process.chdir(pluginDir);
+    } else {
+        // Standalone mode - register minimal tasks for local development.
+        grunt.log.warn('Moodle Gruntfile not found. Running in standalone mode.');
+        grunt.log.warn('For full AMD build, install the plugin in Moodle and run grunt from there.');
 
-    // Register tasks.
-    grunt.registerTask("amd", ["rollup:dev", "rollup:dist"]);
-    grunt.registerTask("default", ["amd"]);
+        // Register empty tasks to prevent errors.
+        grunt.registerTask('amd', 'Build AMD modules (requires Moodle)', function() {
+            grunt.log.error('AMD build requires Moodle installation.');
+            grunt.log.error('Please install the plugin in Moodle and run:');
+            grunt.log.error('  cd /path/to/moodle && npx grunt amd --root=local/skill5');
+        });
+
+        grunt.registerTask('default', ['amd']);
+    }
 
     // Stylelint task (empty for plugins without SCSS).
-    grunt.registerTask("stylelint", []);
+    grunt.registerTask('stylelint', []);
 };
